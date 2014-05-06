@@ -6,7 +6,7 @@ citEntry(entry = "Article",
                              as.person("Joseph A. Veech"),
                              as.person("Charles J. Marsh")),
          year = 2014,
-         journal = "in prep JSS",
+         journal = "in review JSS",
          textVersion =
          paste0("Daniel Griffith, Joseph Veech, and Charles Marsh (",
                 2014,

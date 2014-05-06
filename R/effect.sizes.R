@@ -22,15 +22,23 @@ function(mod, standardized=TRUE, matrix=FALSE){
     effs_2 <- effs[,c(2,1,3)]
     colnames(effs_2) <- c("sp1","sp2","effect")
     effs <- rbind(effs_1,effs_2)
-    effs <- cast(effs,sp1~sp2,value="effect")
-    row.names(effs) <- effs$sp1
+    effs <- recast(data=effs,formula=sp1~sp2,measure.var="effect",id.var=c("sp1","sp2"))
+    #m <- as.matrix(effs[[1]])
+    
+    #rns <- effs[[2]][[1]]
+    #cns <- effs[[2]][[2]]
+    
+    #row.names(m) <- as.character(rns$sp1)
+    #colnames(m) <- as.character(cns$sp2)
+    
+    #m <- effs[mod$spp.names,mod$spp.names]
+    #as.dist(as.matrix(m))
+        row.names(effs) <- effs$sp1
     effs$sp1 <- NULL
         effs <- as.matrix(effs)
     effs <- effs[mod$spp.names,mod$spp.names]
     as.dist(as.matrix(effs))
     
-    
   }
-  
   
 }

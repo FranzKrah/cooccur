@@ -45,6 +45,7 @@ function(x, ...){
   
   #comat
   data.m = melt(comat)
+  colnames(data.m) <- c("X1","X2","value")
   data.m$X1 <- as.character(data.m$X1)
   data.m$X2 <- as.character(data.m$X2)
  

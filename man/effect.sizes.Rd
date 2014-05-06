@@ -34,5 +34,4 @@ cooccur.finches <- cooccur(mat=finches,
 			   spp_names=TRUE)
 effect.sizes(cooccur.finches,matrix=TRUE)
 }
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{co-occurrence}
