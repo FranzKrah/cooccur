@@ -25,6 +25,8 @@ function(object, ...){
                            "Unclassifiable",
                            "Non-random (%)")
   
-  print(cooccur_list)
+  #print(cooccur_list)
+  class(cooccur_list) <- "summary.cooccur"
+  return(cooccur_list)
   #NextMethod("summary")
 }

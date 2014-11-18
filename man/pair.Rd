@@ -8,7 +8,7 @@ Function to examine co-occurrence patterns for an individual species.
 Extracts results for a single species from a \code{cooccur} object.
 }
 \usage{
-pair(mod, spp, all = F)
+pair(mod, spp, all = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

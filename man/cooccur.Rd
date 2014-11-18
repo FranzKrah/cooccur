@@ -11,7 +11,7 @@ This function takes a community dataset (data frame or matrix) of species by sit
 }
 \usage{
 cooccur(mat, type = "spp_site", thresh = TRUE, spp_names = FALSE,
-        true_rand_classifier = 0.1, only_effects = FALSE,
+        true_rand_classifier = 0.1, prob = "hyper", only_effects = FALSE,
         eff_standard = TRUE, eff_matrix = FALSE)
         }
 \arguments{
@@ -29,6 +29,9 @@ Logical. Are there species names in either the column names or row names of the 
 }
   \item{true_rand_classifier}{
 When a species pair is not classified as positive or negative, the species pair can be truely randomly distributed or they can be unclassifiable due to low statistical power. We classify truly random associations as those that do not deviate from their expected co-occurrences by more than 0.1 x the total number of sites. Therefore the default value is 0.1 but any proportion can be specified to be more or less strict.
+}
+  \item{prob}{
+Should co-occurrence probabilities be calculated using the hypergeometric distribution (\code{prob="hyper"}) or the combinatorics approach from Veech 2013 (\code{prob="comb"}).
 }
   \item{only_effects}{
 Logical. Probability calculations can be time consuming; if only effect sizes are required from the analysis, then specific TRUE.

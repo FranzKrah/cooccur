@@ -1,5 +1,5 @@
 pair <-
-function(mod,spp,all=F){
+function(mod,spp,all=FALSE){
   ptab <- mod$results
   if (all==T){
     alpha <- 1

@@ -30,18 +30,42 @@ function(x, ...){
       
   }  
   
-  ind <- apply(comat, 1, function(x) all(is.na(x)))
-  comat <- comat[!ind,]
-  ind <- apply(comat, 2, function(x) all(is.na(x)))
-  comat <- comat[,!ind]
+  #ind <- apply(comat, 1, function(x) all(is.na(x)))
+  #comat <- comat[!ind,]
+  #ind <- apply(comat, 2, function(x) all(is.na(x)))
+  #comat <- comat[,!ind]
+
   comat[is.na(comat)] <- 0
+  
+  # SECTION TO REMOVE SPECIES INTERACTION WITH NO OTHERS
+
+  rmrandomspp <- function(orimat,plotrand = FALSE){
+  if(plotrand == FALSE){
+    ind <- apply(orimat, 1, function(x) all(x==0))
+    orimat <- orimat[!ind,]    
+    ind <- apply(orimat, 2, function(x) all(x==0))
+    orimat <- orimat[,!ind]
+  }
+  return(orimat)
+  }
+  
+  comat <- rmrandomspp(orimat = comat, ...)
+  ####################################################### 
+    
   comat <- comat[order(rowSums(comat)),]
   comat <- comat[,order(colSums(comat))]
   
+  #comat <- rmrandomspp(orimat = comat, ...)
+  
+  #ind <- apply(comat, 1, function(x) all(x==0))
+  #comat <- comat[!ind,]
+  #ind <- apply(comat, 2, function(x) all(x==0))
+  #comat <- comat[,!ind]
+  
   ind <- apply(comat, 1, function(x) all(x==0))
-  comat <- comat[!ind,]
+  comat <- comat[names(sort(ind)),]
   ind <- apply(comat, 2, function(x) all(x==0))
-  comat <- comat[,!ind]
+  comat <- comat[,names(sort(ind))]
   
   #comat
   data.m = melt(comat)
@@ -61,14 +85,14 @@ function(x, ...){
   
   X1 <- df.lower$X1
   X2 <- df.lower$X2
-  value <- df.lower$value 
+  value <- df.lower$value
  
- p <- ggplot(df.lower, aes(X1, X2)) + geom_tile(aes(fill = factor(value)), colour ="white") 
- p <- p + scale_fill_manual(values = c("#FFCC66","dark gray","light blue"), name = "", labels = c("negative","random","positive")) + 
+ p <- ggplot(df.lower, aes(X1, X2)) + geom_tile(aes(fill = factor(value,levels=c(-1,0,1))), colour ="white") 
+ p <- p + scale_fill_manual(values = c("#FFCC66","dark gray","light blue"), name = "", labels = c("negative","random","positive"),drop=FALSE) + 
     theme(axis.text.x = element_blank(),axis.text.y = element_blank(),axis.ticks = element_blank(),plot.title = element_text(vjust=-4,size=20, face="bold"),panel.background = element_rect(fill='white', colour='white'),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),legend.position = c(0.9, 0.5),legend.text=element_text(size=18)) + 
     ggtitle("Species Co-occurrence Matrix") + 
     xlab("") + ylab("") + 
-    scale_x_discrete(limits=meas, expand = c(0.3, 0)) + 
-    scale_y_discrete(limits=meas, expand = c(0.3, 0)) 
+    scale_x_discrete(limits=meas, expand = c(0.3, 0),drop=FALSE) + 
+    scale_y_discrete(limits=meas, expand = c(0.3, 0),drop=FALSE) 
  p + geom_text(data=dfids,aes(label=X1),hjust=1,vjust=0,angle = -22.5)#, color="dark gray")
 }

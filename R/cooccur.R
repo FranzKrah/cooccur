@@ -4,6 +4,7 @@ function(mat,
                     thresh = TRUE, 
                     spp_names = FALSE,
                     true_rand_classifier = 0.1,
+                    prob = "hyper",
                     only_effects=FALSE,
                     eff_standard=TRUE,
                     eff_matrix=FALSE){
@@ -90,28 +91,61 @@ function(mat,
       min_inc <- min(sp1_inc,sp2_inc)
       
       prob_share_site <- rep(0,(nsite+1))
-          
-      if (only_effects == F){
-        for (j in 0:nsite){
-          if ((sp1_inc + sp2_inc) <= (nsite +j) ){
-            if (j <= min_inc){
-              
-              prob_share_site[(j+1)] <- coprob(max_inc=max_inc,j=j,min_inc=min_inc,nsite=nsite) #as.numeric(round(chooseZ(max_inc,j) * chooseZ(nsite - max_inc, min_inc - j),0) / round(chooseZ(nsite,min_inc),0))
-              
-            }
+      
+  # CHOOSE TO CALCULATE PROBABILITIES USING THE
+  # HYPERGEOMETRIC DISTRIBUTION OR VEECH 2013 COMBINATORICS
+      
+      ### Hypergeometric Implementation using phyper ###
+
+          if (prob == "hyper"){
+              if (only_effects == FALSE){
+        
+                all.probs <- phyper(0:min_inc, min_inc, nsite - min_inc, max_inc)
+                prob_share_site[1]<-all.probs[1]
+                for(j in 2:length(all.probs)){
+                  prob_share_site[j] <- all.probs[j]-all.probs[j-1]
+                }
+              }else{
+                for (j in 0:nsite){
+                  if ((sp1_inc + sp2_inc) <= (nsite +j) ){
+                    if (j <= min_inc){
+                      
+                      prob_share_site[(j+1)] <- 1
+                      
+                    }
+                  }
+                }
+              }
+                
           }
-        }
-      }else{
-        for (j in 0:nsite){
-          if ((sp1_inc + sp2_inc) <= (nsite +j) ){
-            if (j <= min_inc){
-              
-              prob_share_site[(j+1)] <- 1
-              
-            }
+      
+      ### Combinatorics Implementation from Veech 2013
+
+          if (prob == "comb"){
+              if (only_effects == FALSE){
+                for (j in 0:nsite){
+                  if ((sp1_inc + sp2_inc) <= (nsite +j) ){
+                    if (j <= min_inc){
+                      
+                      prob_share_site[(j+1)] <- coprob(max_inc=max_inc,j=j,min_inc=min_inc,nsite=nsite) 
+                      
+                    }
+                  }
+                }
+              }else{
+                for (j in 0:nsite){
+                  if ((sp1_inc + sp2_inc) <= (nsite +j) ){
+                    if (j <= min_inc){
+                      
+                      prob_share_site[(j+1)] <- 1
+                      
+                    }
+                  }
+                }
+              }    
           }
-        }
-      }
+      
+      ### END OF PROBABILITY CALCULATIONS
       
       p_lt <- 0
       p_gt <- 0
