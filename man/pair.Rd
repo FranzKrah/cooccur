@@ -32,12 +32,12 @@ Daniel M Griffith}
 \code{\link{prob.table}}
 }
 \examples{
-data(finches)
-cooccur.finches <- cooccur(mat=finches,
-			   type="spp_site",
-			   thresh=TRUE,
-			   spp_names=TRUE)
-pair(cooccur.finches,"Geospiza fortis",all=TRUE)
+#data(finches)
+#cooccur.finches <- cooccur(mat=finches,
+#			   type="spp_site",
+#			   thresh=TRUE,
+#			   spp_names=TRUE)
+#pair(cooccur.finches,"Geospiza fortis",all=TRUE)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

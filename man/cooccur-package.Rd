@@ -23,15 +23,17 @@ License: \tab GPL-2\cr
 Maintainer: Daniel M. Griffith <griffith.dan@gmail.com>
 }
 \references{
-Veech (2013), A probabilistic model for analysing species co-occurrence, Global Ecology and Biogeography, DOI: 10.1111/j.1466-8238.2012.00789.x
+Veech (2013). A probabilistic model for analysing species co-occurrence. Global Ecology and Biogeography, DOI: 10.1111/j.1466-8238.2012.00789.x
+
+Griffith, Veech, and Marsh (2016). cooccur: Probabilistic Species Co-Occurrence Analysis in R. Journal of Statistical Software, 69(2), 1-17. doi:10.18637/jss.v069.c02
 }
 \keyword{ co-occurrence }
 
 \examples{
-data(finches)
-cooccur.finches <- cooccur(mat=finches,
-			   type="spp_site",
-			   thresh=TRUE,
-			   spp_names=TRUE)
-summary(cooccur.finches)
+#data(finches)
+#cooccur.finches <- cooccur(mat=finches,
+#			   type="spp_site",
+#			   thresh=TRUE,
+#			   spp_names=TRUE)
+#summary(cooccur.finches)
 }

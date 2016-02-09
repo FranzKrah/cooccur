@@ -22,12 +22,12 @@ Returns a data.frame with the percentage of "pos", "neg", "rand" associations th
 Daniel M. Griffith}
 
 \examples{
-data(finches)
-cooccur.finches <- cooccur(mat=finches,
-			   type="spp_site",
-			   thresh=TRUE,
-			   spp_names=TRUE)
-pair.attributes(cooccur.finches)
+#data(finches)
+#cooccur.finches <- cooccur(mat=finches,
+#			   type="spp_site",
+#			   thresh=TRUE,
+#			   spp_names=TRUE)
+#pair.attributes(cooccur.finches)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

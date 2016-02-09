@@ -11,7 +11,8 @@ This function takes a community dataset (data frame or matrix) of species by sit
 }
 \usage{
 cooccur(mat, type = "spp_site", thresh = TRUE, spp_names = FALSE,
-        true_rand_classifier = 0.1, prob = "hyper", only_effects = FALSE,
+        true_rand_classifier = 0.1, prob = "hyper", 
+        site_mask = NULL, only_effects = FALSE,
         eff_standard = TRUE, eff_matrix = FALSE)
         }
 \arguments{
@@ -32,6 +33,9 @@ When a species pair is not classified as positive or negative, the species pair 
 }
   \item{prob}{
 Should co-occurrence probabilities be calculated using the hypergeometric distribution (\code{prob="hyper"}) or the combinatorics approach from Veech 2013 (\code{prob="comb"}).
+}
+  \item{site_mask}{
+A matrix with the same dimensions as \code{mat}, where each cell is a 1 or 0. 1 indicates sites that a species can exist and 0 indicates sites where the species cannot exist.
 }
   \item{only_effects}{
 Logical. Probability calculations can be time consuming; if only effect sizes are required from the analysis, then specific TRUE.
@@ -55,7 +59,7 @@ Returns a list of class \code{cooccur}.
 \item{sites }{Number of sites.}
 \item{species }{Number of species.}
 \item{percent_sig }{Percent of pairs classified as either positive or negative.}
-\item{true_rand_classifier }{The proportion used to classify truly pairs.}
+\item{true_rand_classifier }{The proportion used to classify truly random pairs.}
 \item{spp_key }{A key relating the species numbers and names.}
 \item{spp.names }{Ordered list of species names.}
 \item{omitted }{Number of pairs removed due to the threshold filter.}
@@ -63,7 +67,9 @@ Returns a list of class \code{cooccur}.
 
 }
 \references{
-Veech (2013), A probabilistic model for analysing species co-occurrence, Global Ecology and Biogeography, DOI: 10.1111/j.1466-8238.2012.00789.x
+Veech (2013). A probabilistic model for analysing species co-occurrence. Global Ecology and Biogeography, DOI: 10.1111/j.1466-8238.2012.00789.x
+
+Griffith, Veech, and Marsh (2016). cooccur: Probabilistic Species Co-Occurrence Analysis in R. Journal of Statistical Software, 69(2), 1-17. doi:10.18637/jss.v069.c02
 }
 \author{
 Daniel M Griffith
@@ -71,12 +77,12 @@ Daniel M Griffith
 
 \examples{
 
-data(finches)
-cooccur.finches <- cooccur(mat=finches,
-			   type="spp_site",
-			   thresh=TRUE,
-			   spp_names=TRUE)
-summary(cooccur.finches)
+#data(finches)
+#cooccur.finches <- cooccur(mat=finches,
+#			   type="spp_site",
+#			   thresh=TRUE,
+#			   spp_names=TRUE)
+#summary(cooccur.finches)
 #plot(cooccur.finches)
 }
 

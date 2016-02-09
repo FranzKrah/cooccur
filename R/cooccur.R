@@ -5,6 +5,7 @@ function(mat,
                     spp_names = FALSE,
                     true_rand_classifier = 0.1,
                     prob = "hyper",
+                    site_mask = NULL, ## NEW ADDITION
                     only_effects=FALSE,
                     eff_standard=TRUE,
                     eff_matrix=FALSE){
@@ -15,32 +16,62 @@ function(mat,
     if (spp_names == TRUE){
       spp_key <- data.frame(num=1:nrow(spp_site_mat),spp=row.names(spp_site_mat))  
     }
+    if (!is.null(site_mask)){
+      #if (nrow(site_mask)==nrow(spp_site_mat) & ncol(site_mask)==nrow(spp_site_mat)){
+      #}else{
+        if (nrow(site_mask)==nrow(spp_site_mat) & ncol(site_mask)==ncol(spp_site_mat)){
+          N_matrix <- create.N.matrix(site_mask)
+        }else{
+          stop("Incorrect dimensions for site_mask, aborting.")
+        }
+      #}
+    }else{
+      site_mask <- matrix(data = 1,nrow = nrow(spp_site_mat),ncol = ncol(spp_site_mat)) 
+      N_matrix <- matrix(data = ncol(spp_site_mat),nrow = nrow(spp_site_mat),ncol = nrow(spp_site_mat)) # needs doing, add nsite to all
+    }
+    
   # ORGANIZE & INITIALIZE FOR ANALYSIS 
     spp_site_mat[spp_site_mat>0] <- 1
-    nsite <- ncol(spp_site_mat)
+    tsites <- ncol(spp_site_mat)
     nspp <- nrow(spp_site_mat)
     spp_pairs <- choose(nspp,2)
-    incidence <- prob_occur <- matrix(nrow=nspp,ncol=2)
-    obs_cooccur <- prob_cooccur <- exp_cooccur <- matrix(nrow=spp_pairs,ncol=3)
-    prob_share_site <- c(0:(nsite+1))
+    #incidence <- prob_occur <- matrix(nrow=nspp,ncol=2) # needs expanding, pieces moved below
+    incidence <- prob_occur <- obs_cooccur <- prob_cooccur <- exp_cooccur <- matrix(nrow=spp_pairs,ncol=3) # original obs_cooccur <- prob_cooccur <- exp_cooccur <- matrix(nrow=spp_pairs,ncol=3)
+    # ORIGINAL: prob_share_site <- c(0:(nsite+1)) # NEW VERSION WILL BE LIKE sapply(nsite + 1, FUN = function(x){c(0:x)}, simplify = F)
     
   # CALCULATE PROBABILITIES
-    incidence <- cbind(c(1:nrow(spp_site_mat)),rowSums(spp_site_mat,na.rm=T))
-    prob_occur <- cbind(c(1:nrow(spp_site_mat)),rowSums(spp_site_mat,na.rm=T)/nsite)
+  
+    incidence <- prob_occur <- matrix(nrow = nrow(N_matrix),ncol = ncol(N_matrix))
+  
+    # ORIGINAL incidence <- prob_occur <- cbind(c(1:nrow(spp_site_mat)),rowSums(spp_site_mat,na.rm=T)) # this must me expanded to allow pair specific incidence
+    # prob_occur <- cbind(c(1:nrow(spp_site_mat)),rowSums(spp_site_mat,na.rm=T)/nsite) # ORIGINAL, now prob_occur moved up so nsite div later
     
+    for (spp in 1:nspp){
+      if (spp < nspp){
+        for (spp_next in (spp + 1):nspp){
+          incidence[spp,spp_next] <- sum(site_mask[spp,]*site_mask[spp_next,]*mat[spp,])
+          incidence[spp_next,spp] <- sum(site_mask[spp,]*site_mask[spp_next,]*mat[spp_next,])
+        }
+      }
+    }
+  
+    prob_occur <- incidence/N_matrix
+  
     pb <- txtProgressBar(min = 0, max = (nspp + nrow(obs_cooccur)), style = 3)
     
     row <- 0
     for (spp in 1:nspp){
       if (spp < nspp){
         for (spp_next in (spp + 1):nspp){
+          
+          pairs <- sum(as.numeric(mat[spp,site_mask[spp,]*site_mask[spp_next,]==1]==1&mat[spp_next,site_mask[spp,]*site_mask[spp_next,]==1]==1))
           row <- row + 1
-          pairs <- 0
-          for (site in 1:nsite){
-            if (spp_site_mat[spp,site] > 0 & spp_site_mat[spp_next,site] > 0){
-              pairs <- pairs + 1
-            }
-          }
+          #pairs <- 0
+          #for (site in 1:tsites){
+          #  if (spp_site_mat[spp,site] > 0 & spp_site_mat[spp_next,site] > 0){
+          #    pairs <- pairs + 1
+          #  }
+          #}
           
           obs_cooccur[row,1] <- spp
           obs_cooccur[row,2] <- spp_next
@@ -48,11 +79,11 @@ function(mat,
         
           prob_cooccur[row,1] <- spp
           prob_cooccur[row,2] <- spp_next
-          prob_cooccur[row,3] <- prob_occur[spp,2] * prob_occur[spp_next,2]
+          prob_cooccur[row,3] <- prob_occur[spp,spp_next] * prob_occur[spp_next,spp] # ORIGINAL prob_occur[spp,2] * prob_occur[spp_next,2]
           
           exp_cooccur[row,1] <- spp
           exp_cooccur[row,2] <- spp_next
-          exp_cooccur[row,3] <- prob_cooccur[row,3] * nsite
+          exp_cooccur[row,3] <- prob_cooccur[row,3] * N_matrix[spp,spp_next] # original nsite
         
         }
       }
@@ -84,13 +115,16 @@ function(mat,
       sp1 <- obs_cooccur[row,1]
       sp2 <- obs_cooccur[row,2]
       
-      sp1_inc <- incidence[incidence[,1]==sp1,2]
-      sp2_inc <- incidence[incidence[,1]==sp2,2]
+      sp1_inc <- incidence[sp1,sp2] # ORGIGINAL incidence[incidence[,1]==sp1,2]
+      sp2_inc <- incidence[sp2,sp1] # ORGIGINAL incidence[incidence[,1]==sp2,2]
         
       max_inc <- max(sp1_inc,sp2_inc)
       min_inc <- min(sp1_inc,sp2_inc)
       
-      prob_share_site <- rep(0,(nsite+1))
+      nsite <- N_matrix[sp1,sp2] #ADDITION
+      
+      psite <- as.numeric(nsite+1)
+      prob_share_site <- rep(x = 0,times = psite) 
       
   # CHOOSE TO CALCULATE PROBABILITIES USING THE
   # HYPERGEOMETRIC DISTRIBUTION OR VEECH 2013 COMBINATORICS
@@ -187,7 +221,7 @@ function(mat,
     } 
     
   # clasifying true randoms
-    true_rand <- (nrow(output[(output$p_gt >= 0.05 & output$p_lt >= 0.05) & (abs(output$obs_cooccur - output$exp_cooccur) <= (nsite * true_rand_classifier)),]))
+    true_rand <- (nrow(output[(output$p_gt >= 0.05 & output$p_lt >= 0.05) & (abs(output$obs_cooccur - output$exp_cooccur) <= (tsites * true_rand_classifier)),]))
   
   # PREPARE AND DELIVER OUTPUT AS CLASS "cooccur"
     output_list <- list(call = match.call(),
@@ -198,7 +232,7 @@ function(mat,
                         pairs = nrow(output),
                         random = true_rand,
                         unclassifiable = nrow(output) - (true_rand + nrow(output[output$p_gt < 0.05,]) + nrow(output[output$p_lt < 0.05,])),
-                        sites = nsite,
+                        sites = N_matrix,
                         species = nspp,
                         percent_sig = (((nrow(output[output$p_gt < 0.05 | output$p_lt < 0.05,]))) / (nrow(output))) * 100,
                         true_rand_classifier = true_rand_classifier

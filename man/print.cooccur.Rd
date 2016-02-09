@@ -20,12 +20,12 @@ Object of class \code{cooccur}.}
 Daniel M Griffith}
 
 \examples{
-data(finches)
-cooccur.finches <- cooccur(mat=finches,
-			   type="spp_site",
-			   thresh=TRUE,
-			   spp_names=TRUE)
-print(cooccur.finches)
+#data(finches)
+#cooccur.finches <- cooccur(mat=finches,
+#			   type="spp_site",
+#			   thresh=TRUE,
+#			   spp_names=TRUE)
+#print(cooccur.finches)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

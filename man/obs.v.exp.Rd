@@ -21,12 +21,12 @@ Daniel M Griffith
 \code{\link{pair.profile}},\code{\link{plot.cooccur}}
 }
 \examples{
-data(finches)
-cooccur.finches <- cooccur(mat=finches,
-			   type="spp_site",
-			   thresh=TRUE,
-			   spp_names=TRUE)
-obs.v.exp(cooccur.finches)
+#data(finches)
+#cooccur.finches <- cooccur(mat=finches,
+#			   type="spp_site",
+#			   thresh=TRUE,
+#			   spp_names=TRUE)
+#obs.v.exp(cooccur.finches)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

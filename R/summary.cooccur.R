@@ -11,7 +11,7 @@ function(object, ...){
   }
   cat("\nCooccurrence Summary:\n")
   cooccur_list <- c(round(object$species,0),
-                    round(object$sites,0),
+                    round(mean(object$sites,na.rm = T),0), # MODIFIED
                     round(object$positive,0),
                     round(object$negative,0),
                     round(object$random,0),

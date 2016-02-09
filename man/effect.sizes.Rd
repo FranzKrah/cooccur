@@ -27,11 +27,11 @@ Returns either a data.frame of species pairs and effects sizes or a distance mat
 Daniel M Griffith}
 
 \examples{
-data(finches)
-cooccur.finches <- cooccur(mat=finches,
-			   type="spp_site",
-			   thresh=FALSE,
-			   spp_names=TRUE)
-effect.sizes(cooccur.finches,matrix=TRUE)
+#data(finches)
+#cooccur.finches <- cooccur(mat=finches,
+#			   type="spp_site",
+#			   thresh=FALSE,
+#			   spp_names=TRUE)
+#effect.sizes(cooccur.finches,matrix=TRUE)
 }
 \keyword{co-occurrence}

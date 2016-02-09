@@ -1,6 +1,15 @@
 plot.cooccur <-
 function(x, ...){
   
+  ##
+  allargs <- match.call(expand.dots = TRUE)
+  plotrand <- allargs$plotrand
+    plotrand <- ifelse(test = is.null(plotrand),yes = FALSE,no = plotrand)
+  randsummary<- allargs$randsummary
+    randsummary <- ifelse(test = is.null(randsummary),yes = FALSE,no = randsummary)
+
+  ##
+  
   dim <- x$species
   comat_pos <- comat_neg <- matrix(nrow=dim,ncol=dim)
   
@@ -37,21 +46,30 @@ function(x, ...){
 
   comat[is.na(comat)] <- 0
   
+  origN <- nrow(comat)
+  
   # SECTION TO REMOVE SPECIES INTERACTION WITH NO OTHERS
 
-  rmrandomspp <- function(orimat,plotrand = FALSE){
+  #rmrandomspp <- function(orimat,plotrand = FALSE,randsummary = FALSE){
   if(plotrand == FALSE){
-    ind <- apply(orimat, 1, function(x) all(x==0))
-    orimat <- orimat[!ind,]    
-    ind <- apply(orimat, 2, function(x) all(x==0))
-    orimat <- orimat[,!ind]
+    ind <- apply(comat, 1, function(x) all(x==0))
+    comat <- comat[!ind,]    
+    ind <- apply(comat, 2, function(x) all(x==0))
+    comat <- comat[,!ind]
+    #ind <- apply(orimat, 1, function(x) all(x==0))
+    #orimat <- orimat[!ind,]    
+    #ind <- apply(orimat, 2, function(x) all(x==0))
+    #orimat <- orimat[,!ind]
   }
-  return(orimat)
-  }
+  #return(orimat)
+  #}
   
-  comat <- rmrandomspp(orimat = comat, ...)
+  #comat <- rmrandomspp(orimat = comat, dots)
   ####################################################### 
-    
+
+  postN <- nrow(comat)
+
+
   comat <- comat[order(rowSums(comat)),]
   comat <- comat[,order(colSums(comat))]
   
@@ -81,18 +99,69 @@ function(x, ...){
   X2 <- data.m$X2
   
   df.lower = subset(data.m[lower.tri(comat),],X1 != X2)
+  
+  ##### testing the rand summary
+    if(randsummary == FALSE){  
+      }else{
+        dim <- nrow(comat)
+        ext.dim <- round(dim*0.2,digits = 0)
+          if(ext.dim<0){ext.dim<-1}
+        placehold <- paste("ext_", rep(c(1:ext.dim),each = dim), sep="")
+      
+        randcol.df <- data.frame(
+          X1 = placehold,
+          X2 = rep(meas,times = ext.dim),
+          value = rep(x = c(-2), times = dim*ext.dim))
+        
+        df.lower <- rbind(df.lower,randcol.df)
+        meas <- c(meas,unique(placehold))
+      }
 
   
+
+
+  #####
+
   X1 <- df.lower$X1
   X2 <- df.lower$X2
   value <- df.lower$value
  
- p <- ggplot(df.lower, aes(X1, X2)) + geom_tile(aes(fill = factor(value,levels=c(-1,0,1))), colour ="white") 
+
+
+  ####
+ if(randsummary == FALSE){  
+    p <- ggplot(df.lower, aes(X1, X2)) + geom_tile(aes(fill = factor(value,levels=c(-1,0,1))), colour ="white") 
  p <- p + scale_fill_manual(values = c("#FFCC66","dark gray","light blue"), name = "", labels = c("negative","random","positive"),drop=FALSE) + 
     theme(axis.text.x = element_blank(),axis.text.y = element_blank(),axis.ticks = element_blank(),plot.title = element_text(vjust=-4,size=20, face="bold"),panel.background = element_rect(fill='white', colour='white'),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),legend.position = c(0.9, 0.5),legend.text=element_text(size=18)) + 
     ggtitle("Species Co-occurrence Matrix") + 
     xlab("") + ylab("") + 
     scale_x_discrete(limits=meas, expand = c(0.3, 0),drop=FALSE) + 
     scale_y_discrete(limits=meas, expand = c(0.3, 0),drop=FALSE) 
- p + geom_text(data=dfids,aes(label=X1),hjust=1,vjust=0,angle = -22.5)#, color="dark gray")
+ p <- p + geom_text(data=dfids,aes(label=X1),hjust=1,vjust=0,angle = -22.5)#, color="dark gray")
+ 
+   
+      }else{
+        
+         p <- ggplot(df.lower, aes(X1, X2)) + geom_tile(aes(fill = factor(value,levels=c(-1,0,1,-2))), colour ="white") 
+ p <- p + scale_fill_manual(values = c("#FFCC66","dark gray","light blue","light gray"), name = "", labels = c("negative","random","positive","random"),drop=FALSE) + 
+    theme(axis.text.x = element_blank(),axis.text.y = element_blank(),axis.ticks = element_blank(),plot.title = element_text(vjust=-4,size=20, face="bold"),panel.background = element_rect(fill='white', colour='white'),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),legend.position = c(0.9, 0.5),legend.text=element_text(size=18)) + 
+    ggtitle("Species Co-occurrence Matrix") + 
+    xlab("") + ylab("") + 
+    scale_x_discrete(limits=meas, expand = c(0.3, 0),drop=FALSE) + 
+    scale_y_discrete(limits=meas, expand = c(0.3, 0),drop=FALSE) 
+ p <- p + geom_text(data=dfids,aes(label=X1),hjust=1,vjust=0,angle = -22.5)#, color="dark gray")
+ 
+ dim <- nrow(comat)
+ ext_x <- dim + 0.5 #(ext.dim/2)
+ ext_y <- dim + 1
+ nrem <- origN - postN
+ randtext <- paste(nrem, " completely\nrandom species")
+ ext_dat <- data.frame(ext_x=ext_x,ext_y=ext_y,randtext=randtext)
+
+  p <- p + geom_text(data=ext_dat,aes(x = ext_x,y = ext_y,label=randtext),hjust=0,vjust=0, color="dark gray")
+}
+ ####
+ 
+ p
+ 
 }
